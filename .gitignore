@@ -7,3 +7,6 @@ bin/
 obj/
 build/
 .DS_Store
+
+# Local MQTT credentials
+projects/laptop-monitor/mosquitto/config/passwd

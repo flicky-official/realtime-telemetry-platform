@@ -1,0 +1,6 @@
+.env
+mosquitto/config/passwd
+
+# .NET build output
+**/bin/
+**/obj/

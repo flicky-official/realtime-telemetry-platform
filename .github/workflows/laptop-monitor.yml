@@ -1,0 +1,30 @@
+name: Laptop Monitor Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: projects/laptop-monitor
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore packages
+        run: dotnet restore src/MyApp.Api/MyApp.Api.csproj
+
+      - name: Build API
+        run: dotnet build src/MyApp.Api/MyApp.Api.csproj --configuration Release --no-restore

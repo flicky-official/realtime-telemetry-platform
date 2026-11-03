@@ -88,3 +88,11 @@ Full table and reasoning: [`docs/protocol.md`](docs/protocol.md)
 - The broker allows anonymous connections. **Demo only.** Production needs TLS and auth.
 - Single vehicle, no persistence.
 - No latency numbers yet. They'll be added when measured, not estimated.
+
+## Laptop hardware monitoring
+
+The [Laptop Monitor project](projects/laptop-monitor/README.md) adds an
+ASP.NET Core API, PostgreSQL persistence schema, and an MQTT 5 subscriber.
+
+It is under development and remains separate from the vehicle HUD demo.
+See its README for current capabilities and runtime limitations.
