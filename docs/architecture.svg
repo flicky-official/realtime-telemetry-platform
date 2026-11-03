@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300" role="img" aria-label="Architecture: simulator publishes MQTT to Mosquitto, which serves the browser HUD over WebSockets. A C++ daemon is planned.">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#00ff9c"/>
+    </marker>
+  </defs>
+  <rect width="900" height="300" rx="10" fill="#0a0e12"/>
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace" fill="#00ff9c" text-anchor="middle">
+
+    <!-- simulator -->
+    <rect x="30" y="30" width="200" height="80" rx="8" fill="#04070a" stroke="#00ff9c"/>
+    <text x="130" y="65" font-size="18" font-weight="700">Simulator</text>
+    <text x="130" y="88" font-size="13" fill-opacity=".65">Python · 10 Hz</text>
+
+    <!-- daemon (planned) -->
+    <rect x="30" y="190" width="200" height="80" rx="8" fill="none" stroke="#00ff9c" stroke-opacity=".5" stroke-dasharray="6 5"/>
+    <text x="130" y="225" font-size="18" fill-opacity=".6" font-weight="700">C++ daemon</text>
+    <text x="130" y="248" font-size="13" fill-opacity=".45">planned · real hardware</text>
+
+    <!-- broker -->
+    <rect x="350" y="110" width="200" height="80" rx="8" fill="#04070a" stroke="#00ff9c" stroke-width="2"/>
+    <text x="450" y="145" font-size="18" font-weight="700">Mosquitto</text>
+    <text x="450" y="168" font-size="13" fill-opacity=".65">MQTT broker</text>
+
+    <!-- hud -->
+    <rect x="670" y="110" width="200" height="80" rx="8" fill="#04070a" stroke="#00ff9c"/>
+    <text x="770" y="145" font-size="18" font-weight="700">Browser HUD</text>
+    <text x="770" y="168" font-size="13" fill-opacity=".65">stale-data failsafe</text>
+
+    <!-- arrows -->
+    <path d="M230 70 L350 138" stroke="#00ff9c" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <path d="M230 230 L350 162" stroke="#00ff9c" stroke-opacity=".5" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#arr)"/>
+    <path d="M550 150 L668 150" stroke="#00ff9c" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+    <!-- labels -->
+    <text x="300" y="80" font-size="12" fill-opacity=".8">MQTT :1883</text>
+    <text x="609" y="138" font-size="12" fill-opacity=".8">WebSocket :9001</text>
+    <text x="450" y="215" font-size="12" fill-opacity=".55">vehicle/{id}/telemetry · QoS 0</text>
+    <text x="450" y="233" font-size="12" fill-opacity=".55">vehicle/{id}/status · QoS 1 · retained</text>
+  </g>
+</svg>
