@@ -12,7 +12,7 @@ license requirements before publication.
 | Source | Status | Outstanding work |
 |---|---|---|
 | SQL-MQTT-FLUTTER | Snapshot imported into projects/laptop-monitor | Public review, CI, and merge |
-| mqtt-driving-hud | History backed up; source not imported | Review Python driving prototype |
+| mqtt-driving-hud | Snapshot imported into prototypes/driving-hud | Syntax checked; runtime compatibility and integration not verified |
 | mqtt-hud-blazor | History backed up; source not imported | Review source; exclude tracked bin/ and obj/ |
 | mqtt-hud-nextjs | History backed up; source not imported | Review dashboard and publisher; verify remote repository name |
 | mqtt-hud-web | History backed up; source not imported | Review Next.js files and remaining Flutter files |
