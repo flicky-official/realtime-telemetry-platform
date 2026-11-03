@@ -3,134 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HUD // demo</title>
+<title>Driving HUD</title>
 <style>
-  :root { --g:#00ff9c; --red:#ff2e4d; --bg:#04070a; }
+  :root { --fg:#00ff9c; --dim:rgba(0,255,156,.14); --bad:#ff3b4e; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; background:var(--bg); color:var(--g); overflow:hidden;
+  html, body { height:100%; background:#000; color:var(--fg);
     font-family: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace; }
-  body.stale { --g:var(--red); }
+  body.stale { --fg:var(--bad); --dim:rgba(255,59,78,.16); }
 
-  body::before { content:""; position:fixed; inset:0; pointer-events:none;
-    background-image:
-      linear-gradient(rgba(0,255,156,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,156,.05) 1px, transparent 1px);
-    background-size:44px 44px;
-    -webkit-mask-image: radial-gradient(circle at center, #000 20%, transparent 75%);
-            mask-image: radial-gradient(circle at center, #000 20%, transparent 75%); }
-  body::after { content:""; position:fixed; inset:0; pointer-events:none;
-    background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.28) 3px); }
+  main { height:100%; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:1.2vh; }
+  #speed { font-size:min(34vh, 24vw); line-height:1; font-weight:600; letter-spacing:-.02em; }
+  .unit { font-size:clamp(12px,2.2vh,20px); letter-spacing:.4em; opacity:.7; }
 
-  main { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.4vh; }
-  .bar { position:fixed; left:0; right:0; display:flex; justify-content:space-between;
-    padding:2.2vh 3vw; font-size:clamp(10px,1.5vh,14px); letter-spacing:.22em; text-transform:uppercase; opacity:.85; }
-  .bar.top { top:0 } .bar.bottom { bottom:0 }
-  .dot { display:inline-block; width:.8em; height:.8em; border-radius:50%; background:var(--g);
-    box-shadow:0 0 10px var(--g); margin-right:.8em; animation:pulse 1.4s infinite; }
-  @keyframes pulse { 50% { opacity:.25 } }
+  .rpmrow { width:min(520px,80vw); margin-top:3vh; }
+  .rpmtop { display:flex; justify-content:space-between; font-size:clamp(12px,2.4vh,20px); margin-bottom:.8vh; }
+  .track { height:.9vh; min-height:6px; background:var(--dim); border-radius:3px; overflow:hidden; }
+  #rpmfill { height:100%; width:0; background:var(--fg); transition:width .12s linear; }
 
-  svg { height:66vh; width:auto; max-width:92vw; overflow:visible; }
-  .track { fill:none; stroke:rgba(0,255,156,.12); stroke-width:14; }
-  body.stale .track { stroke:rgba(255,46,77,.14); }
-  .fill { fill:none; stroke:var(--g); stroke-width:14; stroke-dasharray:0 100;
-    transition:stroke-dasharray .12s linear; filter:drop-shadow(0 0 8px var(--g)); }
-  .tick { stroke:var(--g); opacity:.45; }
-  .ring { fill:none; stroke:var(--g); opacity:.35; transform-box:fill-box; transform-origin:center; }
-  .spin { animation:spin 24s linear infinite; }
-  .spin.rev { animation-duration:38s; animation-direction:reverse; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  #speed { fill:var(--g); font-size:120px; font-weight:700; text-anchor:middle; filter:drop-shadow(0 0 12px var(--g)); }
-  .unit { fill:var(--g); font-size:16px; letter-spacing:.5em; text-anchor:middle; opacity:.7; }
-  body.stale #speed { animation:glitch .35s steps(2) infinite; }
-  @keyframes glitch { 25% { transform:translate(-4px,1px) } 50% { transform:translate(3px,-2px) } 75% { transform:translate(-2px,2px) } }
-
-  .rpm { display:flex; gap:.5vh; }
-  .rpm i { width:1.1vh; height:3vh; background:rgba(0,255,156,.12); transform:skewX(-18deg); }
-  body.stale .rpm i { background:rgba(255,46,77,.12); }
-  .rpm i.on { background:var(--g); box-shadow:0 0 8px var(--g); }
-  .rpm i.hot.on { background:#ffd000; box-shadow:0 0 8px #ffd000; }
-  .rpmlabel { font-size:clamp(11px,1.9vh,18px); letter-spacing:.3em; opacity:.85; }
+  footer { position:fixed; bottom:0; left:0; right:0; display:flex; justify-content:space-between;
+    padding:2vh 3vw; font-size:clamp(11px,1.8vh,15px); opacity:.75; }
+  .dot { display:inline-block; width:.7em; height:.7em; border-radius:50%; background:var(--fg); margin-right:.6em; }
+  body:not(.stale) .dot.on { animation:blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity:.3 } }
 </style>
 </head>
 <body>
-  <div class="bar top">
-    <span id="veh">VEH // DEMO</span>
-    <span><span class="dot"></span><span id="link">CONNECTING</span></span>
-  </div>
-
   <main>
-    <svg viewBox="0 0 400 400">
-      <g id="ticks"></g>
-      <circle class="ring spin" cx="200" cy="200" r="128" stroke-width="2" stroke-dasharray="2 9"/>
-      <circle class="ring spin rev" cx="200" cy="200" r="116" stroke-width="1" stroke-dasharray="40 14 4 14"/>
-      <path class="track" pathLength="100" d="M 86.86 313.14 A 160 160 0 1 1 313.14 313.14"/>
-      <path id="arc" class="fill" pathLength="100" d="M 86.86 313.14 A 160 160 0 1 1 313.14 313.14"/>
-      <text id="speed" x="200" y="222">--</text>
-      <text class="unit" x="200" y="252">MPH</text>
-    </svg>
-    <div class="rpm" id="rpm"></div>
-    <div class="rpmlabel" id="rpmtext">-- RPM</div>
+    <div id="speed">--</div>
+    <div class="unit">MPH</div>
+    <div class="rpmrow">
+      <div class="rpmtop"><span>RPM</span><span id="rpm">--</span></div>
+      <div class="track"><div id="rpmfill"></div></div>
+    </div>
   </main>
-
-  <div class="bar bottom">
-    <span id="topic"></span>
-    <span id="age">AGE -- ms</span>
-  </div>
+  <footer>
+    <span><span class="dot" id="dot"></span><span id="status">connecting</span></span>
+    <span id="age"></span>
+  </footer>
 
   <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
   <script>
     const q = new URLSearchParams(location.search);
     const VEHICLE = q.get("vehicle") || "demo";
     const WS_PORT = q.get("port") || "9001";
-    const MAX_MPH = 100, MAX_RPM = 6000, SEGS = 32;
+    const DEMO = q.has("demo");        // ?demo = in-browser simulation, no broker needed
+    const MAX_RPM = 6000;
     const $ = id => document.getElementById(id);
 
-    $("veh").textContent = `VEH // ${VEHICLE}`;
-    $("topic").textContent = `vehicle/${VEHICLE}/telemetry`;
-
-    // gauge ticks
-    for (let i = 0; i <= 20; i++) {
-      const a = (135 + i * 13.5) * Math.PI / 180, major = i % 5 === 0, r1 = major ? 172 : 176, r2 = 186;
-      const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      l.setAttribute("x1", 200 + r1 * Math.cos(a)); l.setAttribute("y1", 200 + r1 * Math.sin(a));
-      l.setAttribute("x2", 200 + r2 * Math.cos(a)); l.setAttribute("y2", 200 + r2 * Math.sin(a));
-      l.setAttribute("class", "tick"); l.setAttribute("stroke-width", major ? 2 : 1);
-      $("ticks").appendChild(l);
-    }
-
-    // rpm segments
-    const segs = [];
-    for (let i = 0; i < SEGS; i++) {
-      const s = document.createElement("i");
-      if (i >= SEGS * 0.8) s.className = "hot";
-      $("rpm").appendChild(s); segs.push(s);
-    }
+    let lastMsg = 0, connected = false;
 
     function render(d) {
-      const pct = Math.max(0, Math.min(100, d.speed / MAX_MPH * 100));
-      $("arc").style.strokeDasharray = `${pct} 100`;
       $("speed").textContent = Math.round(d.speed);
-      const lit = Math.round(Math.min(1, d.rpm / MAX_RPM) * SEGS);
-      segs.forEach((s, i) => s.classList.toggle("on", i < lit));
-      $("rpmtext").textContent = `${d.rpm.toLocaleString()} RPM`;
-      $("age").textContent = `AGE ${Math.max(0, Date.now() - d.ts)} ms`;
+      $("rpm").textContent = d.rpm.toLocaleString();
+      $("rpmfill").style.width = Math.min(100, d.rpm / MAX_RPM * 100) + "%";
+      $("age").textContent = `${Math.max(0, Date.now() - d.ts)} ms`;
+      lastMsg = Date.now();
     }
 
-    let connected = false, lastMsg = 0;
-    const DEMO = q.has("demo");   // ?demo = in-browser simulation, no broker needed
     if (DEMO) {
       const t0 = Date.now();
       setInterval(() => {
         const t = (Date.now() - t0) / 1000;
         const speed = 55 + 40 * Math.sin(t / 3);
         render({ speed, rpm: Math.round(1000 + speed * 35 + 150 * Math.sin(t * 2)), ts: Date.now() });
-        lastMsg = Date.now();
       }, 100);
     } else {
       const client = mqtt.connect(`ws://${location.hostname}:${WS_PORT}`, { reconnectPeriod: 1000 });
       client.on("connect", () => { connected = true; client.subscribe(`vehicle/${VEHICLE}/telemetry`); });
       client.on("close",   () => { connected = false; });
-      client.on("message", (topic, msg) => { render(JSON.parse(msg.toString())); lastMsg = Date.now(); });
+      client.on("message", (topic, msg) => render(JSON.parse(msg.toString())));
     }
 
     // Never show old numbers as if they were live.
@@ -138,8 +80,10 @@
       const fresh = lastMsg && Date.now() - lastMsg < 2000;
       const stale = lastMsg > 0 && !fresh;
       document.body.classList.toggle("stale", stale);
-      $("link").textContent = stale ? "SIGNAL LOST" : fresh ? (DEMO ? "SIMULATED" : "LINK LIVE") : connected ? "AWAITING DATA" : "CONNECTING";
-      if (stale) $("age").textContent = "AGE -- ms";
+      $("dot").classList.toggle("on", !!fresh);
+      $("status").textContent = stale ? "NO DATA" : fresh ? (DEMO ? "simulated" : "live")
+                              : connected ? "waiting for data" : "connecting";
+      if (stale) $("age").textContent = "";
     }, 250);
   </script>
 </body>
