@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M60 0H0V60" fill="none" stroke="#00ff9c" stroke-opacity=".07"/>
+    </pattern>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect y="3" width="4" height="1" fill="#000" fill-opacity=".3"/>
+    </pattern>
+    <radialGradient id="halo" cx="90%" cy="90%" r="60%">
+      <stop offset="0" stop-color="#00ff9c" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#00ff9c" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-30%" width="140%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="#0a0a0a"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+  <rect width="1280" height="640" fill="url(#halo)"/>
+
+  <g transform="translate(1120 560)" fill="none" stroke="#00ff9c">
+    <circle r="200" stroke-opacity=".15" stroke-width="16"/>
+    <circle r="200" stroke-width="16" stroke-dasharray="720 1257" transform="rotate(135)" filter="url(#glow)"/>
+    <circle r="160" stroke-opacity=".4" stroke-width="2" stroke-dasharray="3 14"/>
+    <circle r="130" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="50 20 6 20"/>
+  </g>
+
+  <g font-family="DejaVu Sans Mono, ui-monospace, Menlo, Consolas, monospace" fill="#00ff9c">
+    <text x="80" y="110" font-size="24" fill-opacity=".65">flicky // systems</text>
+    <text x="80" y="300" font-size="58" font-weight="700" filter="url(#glow)">realtime-telemetry-platform</text>
+    <text x="80" y="375" font-size="30" fill-opacity=".9">hardware → MQTT → live HUD</text>
+    <text x="80" y="425" font-size="24" fill-opacity=".6">one command · no hardware required</text>
+    <text x="80" y="560" font-size="22" fill-opacity=".5">github.com/flicky-official</text>
+  </g>
+
+  <rect width="1280" height="640" fill="url(#scan)"/>
+  <path d="M30 80V30H80 M1200 30H1250V80 M1250 560V610H1200 M80 610H30V560" fill="none" stroke="#00ff9c" stroke-opacity=".6" stroke-width="3"/>
+</svg>
