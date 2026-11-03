@@ -30,7 +30,7 @@ client.publish(f"vehicle/{VEHICLE}/status", "online", qos=1, retain=True)
 start = time.time()
 while True:
     t = time.time() - start
-    speed = 45 + 25 * math.sin(t / 8)                 # smooth 20-70 mph
+    speed = 55 + 40 * math.sin(t / 3)   # sweeps 15-95 mph
     rpm = 1000 + speed * 35 + 150 * math.sin(t * 2)   # loosely tied to speed
     payload = {
         "speed": round(speed, 1),
