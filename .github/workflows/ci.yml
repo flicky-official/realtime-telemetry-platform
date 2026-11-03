@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start stack
+        run: docker compose up -d --build
+
+      - name: Receive one valid telemetry message
+        run: |
+          sleep 5
+          docker compose exec -T broker mosquitto_sub -t 'vehicle/demo/telemetry' -C 1 -W 15 \
+            | python3 -c "import sys, json; d = json.loads(sys.stdin.readline()); assert {'speed','rpm','ts'} <= d.keys(), d; print('ok', d)"
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop stack
+        if: always()
+        run: docker compose down
