@@ -117,17 +117,28 @@
     }
 
     let connected = false, lastMsg = 0;
-    const client = mqtt.connect(`ws://${location.hostname}:${WS_PORT}`, { reconnectPeriod: 1000 });
-    client.on("connect", () => { connected = true; client.subscribe(`vehicle/${VEHICLE}/telemetry`); });
-    client.on("close",   () => { connected = false; });
-    client.on("message", (topic, msg) => { render(JSON.parse(msg.toString())); lastMsg = Date.now(); });
+    const DEMO = q.has("demo");   // ?demo = in-browser simulation, no broker needed
+    if (DEMO) {
+      const t0 = Date.now();
+      setInterval(() => {
+        const t = (Date.now() - t0) / 1000;
+        const speed = 55 + 40 * Math.sin(t / 3);
+        render({ speed, rpm: Math.round(1000 + speed * 35 + 150 * Math.sin(t * 2)), ts: Date.now() });
+        lastMsg = Date.now();
+      }, 100);
+    } else {
+      const client = mqtt.connect(`ws://${location.hostname}:${WS_PORT}`, { reconnectPeriod: 1000 });
+      client.on("connect", () => { connected = true; client.subscribe(`vehicle/${VEHICLE}/telemetry`); });
+      client.on("close",   () => { connected = false; });
+      client.on("message", (topic, msg) => { render(JSON.parse(msg.toString())); lastMsg = Date.now(); });
+    }
 
     // Never show old numbers as if they were live.
     setInterval(() => {
       const fresh = lastMsg && Date.now() - lastMsg < 2000;
       const stale = lastMsg > 0 && !fresh;
       document.body.classList.toggle("stale", stale);
-      $("link").textContent = stale ? "SIGNAL LOST" : fresh ? "LINK LIVE" : connected ? "AWAITING DATA" : "CONNECTING";
+      $("link").textContent = stale ? "SIGNAL LOST" : fresh ? (DEMO ? "SIMULATED" : "LINK LIVE") : connected ? "AWAITING DATA" : "CONNECTING";
       if (stale) $("age").textContent = "AGE -- ms";
     }, 250);
   </script>
